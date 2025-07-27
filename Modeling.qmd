@@ -1,0 +1,88 @@
+---
+title: "Modeling"
+format: html
+editor: visual
+---
+
+
+#Basic Introduction 
+
+#Split data into testing and training data 
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(yardstick)
+library(ggplot2)
+library(glmnet)
+
+set.seed(123)
+
+model_split <- initial_split(df_model,prop=.7)
+test <- testing(model_split)
+train <- training(model_split)
+diabetes_CV_folds <- vfold_cv(train, 5)
+```
+
+#Logistic Regression Model 
+
+```{r}
+#Model 1: BMI HighBP and PhysActivity
+LR1 <- recipe(Diabetes_binary ~ BMI + HighBP + PhysActivity, data=train) |>
+  step_normalize(BMI)|>
+  step_dummy(HighBP, PhysActivity)
+
+#Model 2: BMI HighBP and PhysActivity and interaction term between
+#BMI and highBP 
+LR2 <- recipe(Diabetes_binary ~ BMI + HighBP + PhysActivity, data=train) |>
+  step_dummy(HighBP, PhysActivity)|>
+  step_normalize(all_predictors())|> 
+  step_interact(~ BMI:starts_with("HighBP_"))
+
+#Model 3: BMI HighBP and PhysActivity and interaction term between
+#BMI and PhysActivity 
+LR3 <- recipe(Diabetes_binary ~ BMI + HighBP + PhysActivity, data=train) |>
+  step_dummy(HighBP, PhysActivity)|>
+  step_normalize(all_predictors())|> 
+  step_interact(~ BMI:starts_with("PhysActivity_"))
+
+#Set model type and engine 
+LR_spec <- logistic_reg() |>
+ set_engine("glm")
+
+#Create workflows
+LR1_wkf <- workflow() |>
+ add_recipe(LR1) |>
+ add_model(LR_spec)
+LR2_wkf <- workflow() |>
+ add_recipe(LR2) |>
+ add_model(LR_spec)
+LR3_wkf <- workflow() |>
+ add_recipe(LR3) |>
+ add_model(LR_spec)
+
+#Fit to CV folds 
+LR1_fit <- LR1_wkf |>
+ fit_resamples(diabetes_CV_folds, metrics = metric_set(accuracy, mn_log_loss))
+LR2_fit <- LR2_wkf |>
+ fit_resamples(diabetes_CV_folds, metrics = metric_set(accuracy, mn_log_loss))
+LR3_fit <- LR3_wkf |>
+ fit_resamples(diabetes_CV_folds, metrics = metric_set(accuracy, mn_log_loss))
+
+rbind(LR1_fit |> collect_metrics(),
+ LR2_fit |> collect_metrics(),
+ LR3_fit |> collect_metrics()) |>
+ mutate(Model = c("Model1", "Model1", "Model2", "Model2", "Model3", "Model3")) |>
+ select(Model, everything())
+
+mean(train$Diabetes_binary=="1")
+
+```
+
+#Classification Tree
+
+
+#Random Forest 
+
+
+
