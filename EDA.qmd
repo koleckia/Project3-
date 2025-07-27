@@ -1,0 +1,100 @@
+---
+title: "EDA"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(dplyr)
+
+```
+
+#Introduction section
+
+##Briefly describes the data and variables you have to work with
+
+##Describe the purpose of your EDA and ultimate goal of modeling
+
+
+#Data: Use a relative path to import data 
+
+
+```{r,results="hide}
+
+diabetes_data <- read.csv("diabetes_binary_health_indicators_BRFSS2015.csv")
+
+diabetes_data <- as_tibble(diabetes_data)
+
+diabetes_data <- diabetes_data |>
+  drop_na() |>
+  mutate(Diabetes_binary =factor(Diabetes_binary))
+
+diabetes_data <- diabetes_data |>
+  drop_na() |>
+  mutate(across(c(Diabetes_binary, HighBP,
+                  HighChol, CholCheck,
+                  Smoker,Stroke),factor))
+
+summary(diabetes_data)
+str(diabetes_data)
+```
+
+#Summarizations: Univariate 
+#Looking at summary statistics of each of the three variables
+#Across the whole data set
+
+```{r}
+
+df_model <- diabetes_data |>
+  drop_na() |>
+  mutate(across(c(Diabetes_binary, HighChol,
+                  PhysActivity, HighBP),factor)) |>
+  select(Diabetes_binary, HighChol, BMI, PhysActivity,HighBP)
+
+#Obtain summary statistics
+summary(df_model)
+str(df_model)
+
+
+#Graph for BMI
+ggplot(data=df_model, aes(x=BMI))+
+  geom_histogram(binwidth=2)
+
+#Graph for High Blood Pressure Distribution 
+ggplot(data=df_model, aes(x=HighBP)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
+  labs(title ="High Blood Pressure Distribution", x="High Blood Pressure", y="Count")+
+  scale_x_discrete(labels =c("No",
+                             "Yes"))
+
+#Graph for Physical Activity 
+ggplot(data=df_model, aes(x=PhysActivity)) +
+  geom_bar() +
+  labs(title ="Physical Activity Distribution", x="Physical Activity", y="Count")+
+  scale_x_discrete(labels =c("No",
+                             "Yes"))
+#Graph for Diabetes 
+ggplot(data=df_model, aes(x=Diabetes_binary)) +
+  geom_bar() +
+  labs(title ="Diabetes Distribution", x="Diabetes", y="Count")+
+  scale_x_discrete(labels =c("No",
+                             "Yes"))
+
+```
+#Look at relationship between diabetes and each of the 
+#indepedent variables
+
+```{r}
+#Diabetes + BMI
+
+#Diabetes + Physical Activity
+
+#Diabetes + High Blood Pressure
+
+#Adding interactions between the three response variables
+
+
+
+```
