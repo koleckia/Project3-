@@ -7,6 +7,7 @@ editor: visual
 ```{r}
 library(tidyverse)
 library(dplyr)
+library(ggplot2)
 
 ```
 
@@ -64,7 +65,7 @@ ggplot(data=df_model, aes(x=BMI))+
 #Graph for High Blood Pressure Distribution 
 ggplot(data=df_model, aes(x=HighBP)) +
   geom_bar() +
-  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5) +
   labs(title ="High Blood Pressure Distribution", x="High Blood Pressure", y="Count")+
   scale_x_discrete(labels =c("No",
                              "Yes"))
@@ -88,13 +89,31 @@ ggplot(data=df_model, aes(x=Diabetes_binary)) +
 
 ```{r}
 #Diabetes + BMI
+ggplot(data = df_model) + 
+  geom_boxplot(mapping = aes(x = Diabetes_binary, y = BMI))
 
 #Diabetes + Physical Activity
+ggplot(data=df_model, aes(fill = PhysActivity, x=Diabetes_binary)) +
+  geom_bar() 
+table(df_model$Diabetes_binary,df_model$PhysActivity)
 
 #Diabetes + High Blood Pressure
+ggplot(data=df_model, aes(fill = HighBP, x=Diabetes_binary)) +
+  geom_bar() 
+table(df_model$Diabetes_binary,df_model$HighBP)
 
-#Adding interactions between the three response variables
+#Looking interactions between the BMI and High blood pressure
+ggplot(data = df_model, 
+  aes(x = HighBP, y = BMI, fill=Diabetes_binary))+
+  geom_boxplot() +
+  theme_minimal()
 
-
+#Looking at interactions between BMI and physical activity
+ggplot(data = df_model, 
+  aes(x = PhysActivity, y = BMI, fill=Diabetes_binary))+
+  geom_boxplot() +
+  theme_minimal()
 
 ```
+
+#Be sure to have a narrative about what you are exploring and what the summaries and graphs you created say about the relationships in your data.
