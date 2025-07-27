@@ -21,21 +21,39 @@ library(ggplot2)
 #Data: Use a relative path to import data 
 
 
-```{r,results="hide}
-
+```{r,results="hide"}
+#Read in data and create a tibble 
 diabetes_data <- read.csv("diabetes_binary_health_indicators_BRFSS2015.csv")
-
 diabetes_data <- as_tibble(diabetes_data)
 
-diabetes_data <- diabetes_data |>
-  drop_na() |>
-  mutate(Diabetes_binary =factor(Diabetes_binary))
+#Create vectors for the factor variables 
+Diabetes_labels <- c("No Diabetes", "Diabetes")
+HighBP_labels <- c("Not High BP", "High BP")
+HighChol_labels <- c("Not High Chol", "Chol")
+PhysActivity_labels <- c("No","Yes")
+Sex_labels <- c("Female","Male")
+Age_labels <- c("18-24","25-29","30-34","35-59",
+                "40-44","45-49","50-54","55-59",
+                "60-64", "65-69", "70-74", "75-79","80 or older")
+Income_levels <-c("Less than $10,000",">15000",">20000",">25000",">35000",">50000",
+                  ">75000","75000+")
 
+
+
+#Mutating the data set to only include the relevant variables models ran and to modify 
+#the type of variable 
 diabetes_data <- diabetes_data |>
   drop_na() |>
-  mutate(across(c(Diabetes_binary, HighBP,
-                  HighChol, CholCheck,
-                  Smoker,Stroke),factor))
+  mutate(
+    Diabetes_binary = factor(Diabetes_binary, levels = c(0,1), labels = Diabetes_labels),
+    HighBP = factor(HighBP, levels = c(0,1), labels = HighBP_labels),
+    HighChol = factor(HighChol, levels = c(0,1), labels = HighChol_labels),
+    PhysActivity = factor(PhysActivity, levels = c(0,1), labels = PhysActivity_labels),
+    Sex = factor(Sex, levels = c(0,1), labels = Sex_labels),
+    Age = factor(Age, levels = 1:13, labels = Age_labels),
+    Income = factor(Income, levels = 1:8, labels = Income_levels)
+  ) |>
+  select(Diabetes_binary,HighBP,HighChol,PhysActivity,Sex,Age,Income,BMI)
 
 summary(diabetes_data)
 str(diabetes_data)
@@ -47,23 +65,21 @@ str(diabetes_data)
 
 ```{r}
 
-df_model <- diabetes_data |>
+df_EDA <- diabetes_data |>
   drop_na() |>
-  mutate(across(c(Diabetes_binary, HighChol,
-                  PhysActivity, HighBP),factor)) |>
   select(Diabetes_binary, HighChol, BMI, PhysActivity,HighBP)
 
 #Obtain summary statistics
-summary(df_model)
-str(df_model)
+summary(df_EDA)
+str(df_EDA)
 
 
 #Graph for BMI
-ggplot(data=df_model, aes(x=BMI))+
+ggplot(data=df_EDA, aes(x=BMI))+
   geom_histogram(binwidth=2)
 
 #Graph for High Blood Pressure Distribution 
-ggplot(data=df_model, aes(x=HighBP)) +
+ggplot(data=df_EDA, aes(x=HighBP)) +
   geom_bar() +
   geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5) +
   labs(title ="High Blood Pressure Distribution", x="High Blood Pressure", y="Count")+
@@ -71,13 +87,13 @@ ggplot(data=df_model, aes(x=HighBP)) +
                              "Yes"))
 
 #Graph for Physical Activity 
-ggplot(data=df_model, aes(x=PhysActivity)) +
+ggplot(data=df_EDA, aes(x=PhysActivity)) +
   geom_bar() +
   labs(title ="Physical Activity Distribution", x="Physical Activity", y="Count")+
   scale_x_discrete(labels =c("No",
                              "Yes"))
 #Graph for Diabetes 
-ggplot(data=df_model, aes(x=Diabetes_binary)) +
+ggplot(data=df_EDA, aes(x=Diabetes_binary)) +
   geom_bar() +
   labs(title ="Diabetes Distribution", x="Diabetes", y="Count")+
   scale_x_discrete(labels =c("No",
@@ -89,27 +105,27 @@ ggplot(data=df_model, aes(x=Diabetes_binary)) +
 
 ```{r}
 #Diabetes + BMI
-ggplot(data = df_model) + 
+ggplot(data = df_EDA) + 
   geom_boxplot(mapping = aes(x = Diabetes_binary, y = BMI))
 
 #Diabetes + Physical Activity
-ggplot(data=df_model, aes(fill = PhysActivity, x=Diabetes_binary)) +
+ggplot(data=df_EDA, aes(fill = PhysActivity, x=Diabetes_binary)) +
   geom_bar() 
-table(df_model$Diabetes_binary,df_model$PhysActivity)
+table(df_EDA$Diabetes_binary,df_EDA$PhysActivity)
 
 #Diabetes + High Blood Pressure
-ggplot(data=df_model, aes(fill = HighBP, x=Diabetes_binary)) +
+ggplot(data=df_EDA, aes(fill = HighBP, x=Diabetes_binary)) +
   geom_bar() 
-table(df_model$Diabetes_binary,df_model$HighBP)
+table(df_EDA$Diabetes_binary,df_EDA$HighBP)
 
 #Looking interactions between the BMI and High blood pressure
-ggplot(data = df_model, 
+ggplot(data = df_EDA, 
   aes(x = HighBP, y = BMI, fill=Diabetes_binary))+
   geom_boxplot() +
   theme_minimal()
 
 #Looking at interactions between BMI and physical activity
-ggplot(data = df_model, 
+ggplot(data = df_EDA, 
   aes(x = PhysActivity, y = BMI, fill=Diabetes_binary))+
   geom_boxplot() +
   theme_minimal()

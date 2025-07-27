@@ -15,10 +15,11 @@ library(tidymodels)
 library(yardstick)
 library(ggplot2)
 library(glmnet)
+library(tree)
 
 set.seed(123)
 
-model_split <- initial_split(df_model,prop=.7)
+model_split <- initial_split(diabetes_data,prop=.7)
 test <- testing(model_split)
 train <- training(model_split)
 diabetes_CV_folds <- vfold_cv(train, 5)
@@ -75,11 +76,47 @@ rbind(LR1_fit |> collect_metrics(),
  mutate(Model = c("Model1", "Model1", "Model2", "Model2", "Model3", "Model3")) |>
  select(Model, everything())
 
-mean(train$Diabetes_binary=="1")
+mean(train$Diabetes_binary=="Diabetes")
 
 ```
 
 #Classification Tree
+
+```{r}
+#Create Recipe 
+tree_rec <- recipe(Diabetes_binary ~ ., data = train) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_normalize(all_predictors())
+
+tree_rec
+
+tree_mod <- decision_tree(tree_depth = tune(),
+  min_n = 20,
+  cost_complexity = tune()) |>
+  set_engine("rpart") |>
+  set_mode("classification")
+
+#Create workflow 
+tree_wkf <- workflow() |>
+  add_recipe(tree_rec) |>
+  add_model(tree_mod)
+
+#Set up my own tuning grid
+tree_grid <- grid_regular(cost_complexity(),
+                          tree_depth(),
+                          levels = c(10, 5))
+
+tree_fits <- tree_wkf |> 
+  tune_grid(resamples = diabetes_CV_folds,
+            grid = tree_grid,
+            metrics=metric_set(mn_log_loss))
+
+tree_fits |>
+  collect_metrics() 
+
+
+```
+
 
 
 #Random Forest 
