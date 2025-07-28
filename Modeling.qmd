@@ -208,9 +208,22 @@ rf_final_fit |> collect_metrics()
 LR3_final_fit <- LR3_wkf |>
  last_fit(model_split, metrics = metric_set(accuracy, mn_log_loss)) 
 
+tree_final_fit|> collect_metrics()
+rf_final_fit |> collect_metrics()
 LR3_final_fit |> collect_metrics()
 
+rbind(tree_final_fit |> collect_metrics(),
+rf_final_fit |> collect_metrics(),
+ LR3_final_fit |> collect_metrics()) |>
+ mutate(Model = c("Classification Model", "Classification Model", "Random Forest", "Random Forest", "Logistic Regression", "Logistic Regression")) |>
+ select(Model, everything())
+
+
+final_model <- rf_final_fit$.workflow[[1]]
+
 ```
+
+Declare Random Forest the Overall winner!! 
 
 
 
