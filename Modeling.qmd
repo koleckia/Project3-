@@ -16,6 +16,9 @@ library(yardstick)
 library(ggplot2)
 library(glmnet)
 library(tree)
+library(baguette)
+library(parsnip)
+library(ranger)
 
 set.seed(123)
 
@@ -84,9 +87,9 @@ mean(train$Diabetes_binary=="Diabetes")
 
 ```{r}
 #Create Recipe 
-tree_rec <- recipe(Diabetes_binary ~ ., data = train) |>
-  step_dummy(all_nominal_predictors()) |>
-  step_normalize(all_predictors())
+tree_rec <- recipe(Diabetes_binary ~ BMI + HighBP + PhysActivity, data=train) |>
+  step_normalize(BMI)|>
+  step_dummy(all_nominal_predictors())
 
 tree_rec
 
@@ -109,17 +112,105 @@ tree_grid <- grid_regular(cost_complexity(),
 tree_fits <- tree_wkf |> 
   tune_grid(resamples = diabetes_CV_folds,
             grid = tree_grid,
-            metrics=metric_set(mn_log_loss))
+            metrics=metric_set(accuracy, mn_log_loss))
 
 tree_fits |>
   collect_metrics() 
 
+tree_fits %>%
+  collect_metrics() %>%
+  mutate(tree_depth = factor(tree_depth)) %>%
+  ggplot(aes(cost_complexity, mean, color = tree_depth)) +
+  geom_line(size = 1.5, alpha = 0.6) +
+  geom_point(size = 2) +
+  facet_wrap(~ .metric, scales = "free", nrow = 2) +
+  scale_x_log10(labels = scales::label_number()) +
+  scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
+
+tree_fits |>
+  collect_metrics() |>
+  filter(.metric == "mn_log_loss") |>
+  arrange(mean)
+
+
+tree_best_params <- select_best(tree_fits, metric = "mn_log_loss")
+tree_best_params
+
+tree_final_wkf <- tree_wkf |>
+  finalize_workflow(tree_best_params)
+
+tree_final_fit <- tree_final_wkf |>
+  last_fit(model_split,metrics = metric_set(accuracy, mn_log_loss))
+tree_final_fit
+
+tree_final_fit |>
+  collect_metrics()
+
+
+tree_final_model %>%
+  extract_fit_engine() %>%
+  rpart.plot::rpart.plot(roundint = FALSE)
 
 ```
 
 
 
 #Random Forest 
+```{r}
+
+ran_forest_rec <- recipe(Diabetes_binary ~ BMI + HighBP + PhysActivity, data=train) |>
+  step_normalize(BMI)|>
+  step_dummy(all_nominal_predictors())
+
+ran_forest_rec
+
+
+rf_spec <- rand_forest(mtry = tune()) |>
+ set_engine("ranger") |>
+ set_mode("classification")
+
+rf_wkf <- workflow() |>
+ add_recipe(ran_forest_rec) |>
+ add_model(rf_spec)
+
+rf_fit <- rf_wkf |>
+ tune_grid(resamples = diabetes_CV_folds,
+ grid = 7,
+ metrics = metric_set(accuracy, mn_log_loss))
+
+rf_fit |>
+ collect_metrics() |>
+ filter(.metric == "mn_log_loss") |>
+ arrange(mean)
+
+rf_best_params <- select_best(rf_fit, metric = "mn_log_loss")
+rf_best_params
+
+rf_final_wkf <- rf_wkf |>
+ finalize_workflow(rf_best_params)
+
+rf_final_fit <- rf_final_wkf |>
+ last_fit(model_split, metrics = metric_set(accuracy, mn_log_loss))
+
+```
+
+#Final Model Selection 
+```{r}
+tree_final_fit <- tree_final_wkf |>
+  last_fit(model_split,metrics = metric_set(accuracy, mn_log_loss))
+tree_final_fit|> collect_metrics()
+
+rf_final_fit <- rf_final_wkf |>
+ last_fit(model_split, metrics = metric_set(accuracy, mn_log_loss))
+rf_final_fit |> collect_metrics()
+
+
+LR3_final_fit <- LR3_wkf |>
+ last_fit(model_split, metrics = metric_set(accuracy, mn_log_loss)) 
+
+LR3_final_fit |> collect_metrics()
+
+```
 
 
 
