@@ -9,7 +9,7 @@ editor: visual
 
 #Split data into testing and training data 
 
-```{r}
+```{r,include= FALSE}
 library(tidyverse)
 library(tidymodels)
 library(yardstick)
@@ -23,7 +23,7 @@ library(ranger)
 
 
 
-```{r}
+```{r, include = FALSE }
 #Reload the data 
 #Read in data and create a tibble 
 diabetes_data <- read.csv("diabetes_binary_health_indicators_BRFSS2015.csv")
@@ -60,6 +60,15 @@ diabetes_data <- diabetes_data |>
 ```
 
 
+#Introduction 
+
+On our EDA page, we explored three variables, BMI, High blood pressure, and physical activity, by looking at their distribution of each of the variables in the data set as well as their relationship with diabetes. These variables were picked to determine the cardiometabolic factors effect on diabetes.
+
+Now, we will fit three models, logistic regression model, classification tree, and random forests to look at how they relate with each other in terms of predicting the likelihood of having diabetes. 
+
+
+#Split data into testing and training set
+
 ```{r}
 set.seed(123)
 
@@ -70,6 +79,10 @@ diabetes_CV_folds <- vfold_cv(train, 5)
 ```
 
 #Logistic Regression Model 
+
+A logistic regression model is a model that can predict the probability of a binary variable based on various independent variables. 
+
+In this example, we can apply this model since our dependent variable, diabetes, is binary. We will fit three models, one with BMI, High blood pressure, and PhysActivity, one with those three variables and an interaction on BMI and High blood pressure, and one with the three variables and an interaction on BMI and physical activity.
 
 ```{r}
 #Model 1: BMI HighBP and PhysActivity
@@ -125,6 +138,10 @@ mean(train$Diabetes_binary=="Diabetes")
 ```
 
 #Classification Tree
+
+A classification tree can be used to predict the outcome of a categorical or binary variable by assigning variables to different classes. This is done by using a fitting process and partitioning by the specific variables into seperate sections. This can be easier to interpret and better for non-linear data than a logistic regression model would be.
+
+For example, in this model we will take BMI, high blood pressure and physical activity and using the fitting process, determine specific branches to find groups that are more likely to have diabetes. 
 
 ```{r}
 #Create Recipe 
@@ -193,6 +210,10 @@ tree_final_fit |>
 
 
 #Random Forest 
+
+A random forest model is very similar to a classification tree as it similarly predicts the outcome of a categorical variable by splitting each variable into subsets to come to a final decision/ predictions. The difference between the classification tree and a random forest is that a random forest is an ensemble model. This means that this will produce multiple decision trees and will take the average across all of the trees. The classification model will only ever produce one tree. The purpose of this is to reduce over fitting. 
+
+
 ```{r}
 
 ran_forest_rec <- recipe(Diabetes_binary ~ BMI + HighBP + PhysActivity, data=train) |>
@@ -260,7 +281,8 @@ final_model <- rf_final_fit$.workflow[[1]]
 
 ```
 
-Declare Random Forest the Overall winner!! 
+By looking at the log loss metrics, we can see that random forest has the lowest value for log-loss and is the best model overall of the three that were fit.
+
 
 
 
