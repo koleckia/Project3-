@@ -13,13 +13,13 @@ library(ggplot2)
 
 #Introduction section
 
-##Briefly describes the data and variables you have to work with
+For this project, I will be analyzing the impact of specific health indicators on the likelhood of getting diabetes. While there are many indicators in the data set, I have decided to only look into three specific variables: Physical activity, BMI and Blood Pressure. I picked these three variables to specifically narrow down the impacts of cardiometabolic factors on diabetes. 
 
-##Describe the purpose of your EDA and ultimate goal of modeling
+For the next section of the project, I will do exploratory data analysis to analyze the relationships each of the three variables have on the independent variable, diabetes. This will also help identify any data quality issues and help understand the different data types and distributions. 
 
+Lastly, I will use three models on the different variables to help understand the relationships and make predictions about diabetes probabilities in the future. The three models will be a logistic regression model, classification tree, and a random forest. 
 
 #Data: Use a relative path to import data 
-
 
 ```{r,results="hide"}
 #Read in data and create a tibble 
@@ -35,13 +35,13 @@ Sex_labels <- c("Female","Male")
 Age_labels <- c("18-24","25-29","30-34","35-59",
                 "40-44","45-49","50-54","55-59",
                 "60-64", "65-69", "70-74", "75-79","80 or older")
-Income_levels <-c("Less than $10,000",">15000",">20000",">25000",">35000",">50000",
-                  ">75000","75000+")
+Income_levels <-c("Less than $10,000",">15000",">20000",">25000",">35000"
+                  ,">50000",">75000","75000+")
 
 
 
-#Mutating the data set to only include the relevant variables models ran and to modify 
-#the type of variable 
+#Mutating the data set to only include the relevant variables models ran and to 
+#modify the type of variable and remove missing variables 
 diabetes_data <- diabetes_data |>
   drop_na() |>
   mutate(
@@ -53,86 +53,203 @@ diabetes_data <- diabetes_data |>
     Age = factor(Age, levels = 1:13, labels = Age_labels),
     Income = factor(Income, levels = 1:8, labels = Income_levels)
   ) |>
-  select(Diabetes_binary,HighBP,HighChol,PhysActivity,Sex,Age,Income,BMI)
+  select(Diabetes_binary,HighBP,PhysActivity,BMI)
+```
 
+#Summarizations: Univariate 
+
+```{r,results="hide"}
+#Look at summary of the data and the structure of the variables 
 summary(diabetes_data)
 str(diabetes_data)
 ```
 
-#Summarizations: Univariate 
-#Looking at summary statistics of each of the three variables
-#Across the whole data set
+Above, we can see the frequency of our variables and the variable type for each variable. This will be important later as we create the models.
 
 ```{r}
-
-df_EDA <- diabetes_data |>
-  drop_na() |>
-  select(Diabetes_binary, HighChol, BMI, PhysActivity,HighBP)
-
-#Obtain summary statistics
-summary(df_EDA)
-str(df_EDA)
-
-
 #Graph for BMI
-ggplot(data=df_EDA, aes(x=BMI))+
-  geom_histogram(binwidth=2)
-
-#Graph for High Blood Pressure Distribution 
-ggplot(data=df_EDA, aes(x=HighBP)) +
-  geom_bar() +
-  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5) +
-  labs(title ="High Blood Pressure Distribution", x="High Blood Pressure", y="Count")+
-  scale_x_discrete(labels =c("No",
-                             "Yes"))
-
-#Graph for Physical Activity 
-ggplot(data=df_EDA, aes(x=PhysActivity)) +
-  geom_bar() +
-  labs(title ="Physical Activity Distribution", x="Physical Activity", y="Count")+
-  scale_x_discrete(labels =c("No",
-                             "Yes"))
-#Graph for Diabetes 
-ggplot(data=df_EDA, aes(x=Diabetes_binary)) +
-  geom_bar() +
-  labs(title ="Diabetes Distribution", x="Diabetes", y="Count")+
-  scale_x_discrete(labels =c("No",
-                             "Yes"))
-
+ggplot(data=diabetes_data, aes(x=BMI))+
+  geom_histogram(aes(y=after_stat(count/sum(count))),
+                 binwidth=2,fill="lightblue",
+                 color ="blue") +
+  scale_y_continuous(labels = function(x) paste0(round(x * 100, 1), "%")) +
+  xlab("BMI")+
+  ylab("Frequency")+
+  theme_minimal()
 ```
+
+Looking at the histogram of BMI by count, we can determine the data is slightly left skewed, while the median BMI in the data set is 27.  
+
+```{r,results="Hide"}
+#Pivot  
+Frequencies <- diabetes_data |>
+  select("HighBP", "Diabetes_binary", "PhysActivity") |>
+  pivot_longer(everything(),names_to = "Variables", values_to="Categories") |>
+  group_by(Variables,Categories) |>
+  summarize(count = n(), .groups ="drop") |>
+  group_by(Variables) |>
+  mutate(Percentage = round(100 * count / sum(count), 1))
+```
+
+
+```{r}
+#Graph for Frequencies of Physical Activity, High BP, and Diabetes 
+ggplot(Frequencies, aes(x = factor(Categories), y = Percentage, fill = factor(Categories))) +
+  geom_col(color = "blue") +
+  geom_text(aes(label = paste0(Percentage, "%")), vjust = -0.5) +
+  scale_y_continuous(limits = c(0, 100),expand = expansion(mult = c(0, 0.05))) +
+  facet_wrap(~ Variables, scales = "free_x") +
+  labs(x = "Category", y = "Percentage", title = "Distribution of Variables in Diabetes Dataset") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+From looking at this chart, we can determine that only around 14% of our sample has diabetes. 
+The amount of the sample with high blood pressure is almost 43% and those who excercise is around 76% 
+
 #Look at relationship between diabetes and each of the 
 #indepedent variables
 
 ```{r}
 #Diabetes + BMI
-ggplot(data = df_EDA) + 
-  geom_boxplot(mapping = aes(x = Diabetes_binary, y = BMI))
+Diabetes_means <- diabetes_data |> 
+  group_by(Diabetes_binary)|>
+  summarize(BMI_mean = mean(BMI,na.rm =TRUE), count =n())
+            
+print(Diabetes_means)
 
-#Diabetes + Physical Activity
-ggplot(data=df_EDA, aes(fill = PhysActivity, x=Diabetes_binary)) +
-  geom_bar() 
-table(df_EDA$Diabetes_binary,df_EDA$PhysActivity)
+ggplot(data = diabetes_data, aes(x = Diabetes_binary, y = BMI, fill = Diabetes_binary)) +
+  geom_boxplot(outlier.color = "red", outlier.shape = 16, outlier.size = 2, notch = TRUE) +
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 3, fill = "yellow", color = "black")+
+  scale_fill_manual(values = c("skyblue", "salmon")) +
+  labs(
+    title = "BMI Distribution by Diabetes Status",
+    x = "Diabetes Status",
+    y = "Body Mass Index (BMI)",
+    fill = "Diabetes"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "none"
+  )
+```
+From the summary table and the box plot, we can see that the mean BMI from those with diabetes is slightly greater than those without diabetes, concluding there could be some relationship that a higher BMI relates to having diabetes. 
 
-#Diabetes + High Blood Pressure
-ggplot(data=df_EDA, aes(fill = HighBP, x=Diabetes_binary)) +
-  geom_bar() 
-table(df_EDA$Diabetes_binary,df_EDA$HighBP)
+```{r}
+#Diabetes + High BP
+#Create a frequency table 
+High_BP_Percentages <- diabetes_data |>
+    group_by(Diabetes_binary,HighBP) |>
+  summarise(count =n (),.groups = 'drop') |>
+  group_by(Diabetes_binary)|>
+  mutate(percent = 100 * count / sum(count))
 
+print(High_BP_Percentages)
+
+#Create a stacked bar chart to visually demonstrate 
+ggplot(High_BP_Percentages, aes(x = factor(Diabetes_binary), y = percent, fill = HighBP)) +
+  geom_bar(stat = "identity", color = "black") +
+  geom_text(aes(label = paste0(round(percent, 1), "%")),
+            position = position_stack(vjust = 0.5), size = 4, color = "black") +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(
+    title = "High BP by Diabetes Status",
+    x = "Diabetes Status",
+    y = "Percentage",
+    fill = "High Blood Pressure"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+From this graph, we can clearly see that those who have diabetes are much more likely to have high blood pressure as 75% have high blood pressure compared to only 38% of those who do not have diabetes. 
+
+```{r}
+#Diabetes + High BP
+#Create a frequency table 
+Phys_Activity_Percentages <- diabetes_data |>
+    group_by(Diabetes_binary,PhysActivity) |>
+  summarise(count =n (),.groups = 'drop') |>
+  group_by(Diabetes_binary)|>
+  mutate(percent = 100 * count / sum(count))
+
+print(Phys_Activity_Percentages)
+
+#Create a stacked bar chart to visually demonstrate 
+ggplot(Phys_Activity_Percentages, aes(x = factor(Diabetes_binary), y = percent, fill = PhysActivity)) +
+  geom_bar(stat = "identity", color = "black") +
+  geom_text(aes(label = paste0(round(percent, 1), "%")),
+            position = position_stack(vjust = 0.5), size = 4, color = "black") +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(
+    title = "Physical Activity by Diabetes Status",
+    x = "Diabetes Status",
+    y = "Percentage",
+    fill = "Physical Activity"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+When looking at the chart of diabetes status by physical activity, we can see that over 50% of those with diabetes do physical activity, but those who do not have diabetes are more likely to do physical activity.
+
+```{r}
 #Looking interactions between the BMI and High blood pressure
-ggplot(data = df_EDA, 
-  aes(x = HighBP, y = BMI, fill=Diabetes_binary))+
-  geom_boxplot() +
-  theme_minimal()
+BMIMeans <- diabetes_data |>
+  group_by(HighBP, Diabetes_binary) |>
+  summarize(mean_BMI =mean(BMI),.groups="drop")
 
-#Looking at interactions between BMI and physical activity
-ggplot(data = df_EDA, 
-  aes(x = PhysActivity, y = BMI, fill=Diabetes_binary))+
-  geom_boxplot() +
-  theme_minimal()
+print(BMIMeans)
+
+ggplot(data = diabetes_data, aes(x = HighBP, y = BMI, fill = factor(Diabetes_binary))) +
+  geom_boxplot(outlier.color = "red", outlier.size = 1) +
+  scale_fill_manual(
+    values = c("No Diabetes" = "skyblue", "Diabetes" = "salmon"),
+    name = "Diabetes Status",
+    labels = c("No", "Yes")
+  ) +
+  labs(
+    title = "BMI Distribution by High Blood Pressure and Diabetes Status",
+    x = "High Blood Pressure",
+    y = "Body Mass Index (BMI)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "top"
+  )
+```
+
+From the table of means and the boxplot we can determine that those with diabetes have a slightly greater BMI despite there blood pressure status. Those who have high BP typically have a higher BMI despite diabetes status. 
+
+```{r}
+#Looking interactions between the BMI and Physical Activity
+PhysicalAct_Means <- diabetes_data |>
+  group_by(PhysActivity, Diabetes_binary) |>
+  summarize(mean_BMI =mean(BMI),.groups="drop")
+
+print(PhysicalAct_Means)
+
+ggplot(data = diabetes_data, aes(x = PhysActivity, y = BMI, fill = factor(Diabetes_binary))) +
+  geom_boxplot(outlier.color = "red", outlier.size = 1) +
+  scale_fill_manual(
+    values = c("No Diabetes" = "skyblue", "Diabetes" = "salmon"),
+    name = "Diabetes Status",
+    labels = c("No", "Yes")
+  ) +
+  labs(
+    title = "BMI Distribution by Physical Activity and Diabetes Status",
+    x = "Physical Activity",
+    y = "Body Mass Index (BMI)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "top"
+  )
 
 ```
 
-#Be sure to have a narrative about what you are exploring and what the summaries and graphs you created say about the relationships in your data.
 
 
 [Click here for the Modeling Page](Modeling.html)
