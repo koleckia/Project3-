@@ -133,3 +133,6 @@ ggplot(data = df_EDA,
 ```
 
 #Be sure to have a narrative about what you are exploring and what the summaries and graphs you created say about the relationships in your data.
+
+
+[Click here for the Modeling Page](Modeling.html)
