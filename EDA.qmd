@@ -11,7 +11,7 @@ library(ggplot2)
 
 ```
 
-#Introduction section
+Introduction section
 
 For this project, I will be analyzing the impact of specific health indicators on the likelhood of getting diabetes. While there are many indicators in the data set, I have decided to only look into three specific variables: Physical activity, BMI and Blood Pressure. I picked these three variables to specifically narrow down the impacts of cardiometabolic factors on diabetes. 
 
@@ -108,8 +108,7 @@ From looking at this chart, we can determine that only around 14% of our sample 
 
 The amount of the sample with high blood pressure is almost 43% and those who excercise is around 76%. 
 
-#Look at relationship between diabetes and each of the 
-#indepedent variables
+#Look at relationship between diabetes and each of the indepedent variables
 
 ```{r}
 #Diabetes + BMI
@@ -251,7 +250,7 @@ ggplot(data = diabetes_data, aes(x = PhysActivity, y = BMI, fill = factor(Diabet
 
 ```
 
-#Takeaways from EDA 
+Takeaways from EDA 
 
 From our EDA, we can determine that all three variables have at least some effect on diabetes, although it does not seem that all variables were created equal, as high blood seems to have the strongest relationship with diabetes. 
 

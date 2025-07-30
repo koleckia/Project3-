@@ -214,9 +214,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>[1] 0.1390447</code></pre>
 </div>
 </div>
+<p>From the infomation above, we will choose Model3 as our best model given the lowest log loss.</p>
 <p>#Classification Tree</p>
-<p>A classification tree can be used to predict the outcome of a categorical or binary variable by assigning variables to different classes. This is done by using a fitting process and partitioning by the specific variables into seperate sections. This can be easier to interpret and better for non-linear data than a logistic regression model would be.</p>
-<p>For example, in this model we will take BMI, high blood pressure and physical activity and using the fitting process, determine specific branches to find groups that are more likely to have diabetes.</p>
+<p>A classification tree can be used to predict the outcome of a categorical or binary variable by assigning variables to different classes. This is done by using a fitting process and partitioning by the specific variables into separate sections. This can be easier to interpret and better for non-linear data than a logistic regression model would be.</p>
+<p>In this model we will take BMI, high blood pressure and physical activity and using the fitting process, determine specific branches to find groups that are more likely to have diabetes.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Create Recipe </span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>tree_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Diabetes_binary <span class="sc">~</span> BMI <span class="sc">+</span> HighBP <span class="sc">+</span> PhysActivity, <span class="at">data=</span>train) <span class="sc">|&gt;</span></span>
@@ -513,6 +514,7 @@ predictor: 3</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>final_model <span class="ot">&lt;-</span> rf_final_fit<span class="sc">$</span>.workflow[[<span class="dv">1</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Above, we have the best model of the logistic regression model, classification tree, and random forest. Using log loss, we have determined the best model of all 3 model choices and made a dataframe to compare them against each other.</p>
 <p>By looking at the log loss metrics, we can see that random forest has the lowest value for log-loss and is the best model overall of the three that were fit.</p>
 
 

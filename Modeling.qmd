@@ -5,9 +5,6 @@ editor: visual
 ---
 
 
-#Basic Introduction 
-
-#Split data into testing and training data 
 
 ```{r,include= FALSE}
 library(tidyverse)
@@ -60,14 +57,14 @@ diabetes_data <- diabetes_data |>
 ```
 
 
-#Introduction 
+Introduction 
 
 On our EDA page, we explored three variables, BMI, High blood pressure, and physical activity, by looking at their distribution of each of the variables in the data set as well as their relationship with diabetes. These variables were picked to determine the cardiometabolic factors effect on diabetes.
 
 Now, we will fit three models, logistic regression model, classification tree, and random forests to look at how they relate with each other in terms of predicting the likelihood of having diabetes. 
 
 
-#Split data into testing and training set
+Split data into testing and training set
 
 ```{r}
 set.seed(123)
@@ -78,7 +75,7 @@ train <- training(model_split)
 diabetes_CV_folds <- vfold_cv(train, 5)
 ```
 
-#Logistic Regression Model 
+Logistic Regression Model 
 
 A logistic regression model is a model that can predict the probability of a binary variable based on various independent variables. 
 
@@ -139,7 +136,7 @@ mean(train$Diabetes_binary=="Diabetes")
 
 From the infomation above, we will choose Model3 as our best model given the lowest log loss.
 
-#Classification Tree
+Classification Tree
 
 A classification tree can be used to predict the outcome of a categorical or binary variable by assigning variables to different classes. This is done by using a fitting process and partitioning by the specific variables into separate sections. This can be easier to interpret and better for non-linear data than a logistic regression model would be.
 
@@ -210,7 +207,7 @@ tree_final_fit |>
 ```
 
 
-#Random Forest 
+Random Forest 
 
 A random forest model is very similar to a classification tree as it similarly predicts the outcome of a categorical variable by splitting each variable into subsets to come to a final decision/ predictions. The difference between the classification tree and a random forest is that a random forest is an ensemble model. This means that this will produce multiple decision trees and will take the average across all of the trees. The classification model will only ever produce one tree. The purpose of this is to reduce over fitting. 
 
@@ -253,7 +250,7 @@ rf_final_fit <- rf_final_wkf |>
 
 ```
 
-#Final Model Selection 
+Final Model Selection 
 ```{r}
 tree_final_fit <- tree_final_wkf |>
   last_fit(model_split,metrics = metric_set(accuracy, mn_log_loss))

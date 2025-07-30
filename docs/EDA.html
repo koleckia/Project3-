@@ -135,8 +135,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <p>#Introduction section</p>
 <p>For this project, I will be analyzing the impact of specific health indicators on the likelhood of getting diabetes. While there are many indicators in the data set, I have decided to only look into three specific variables: Physical activity, BMI and Blood Pressure. I picked these three variables to specifically narrow down the impacts of cardiometabolic factors on diabetes.</p>
-<p>For the next section of the project, I will do exploratory data analysis to analyze the relationships each of the three variables have on the independent variable, diabetes. This will also help identify any data quality issues and help understand the different data types and distributions.</p>
-<p>Lastly, I will use three models on the different variables to help understand the relationships and make predictions about diabetes probabilities in the future. The three models will be a logistic regression model, classification tree, and a random forest.</p>
+<p>For the next section of the project, I will do exploratory data analysis to analyze the relationships each of the three variables have on the independent variable of having diabetes. This EDA will also help identify any data quality issues and help understand the different data types and distributions.</p>
+<p>In the second part of this project, I will use three different models to help understand the relationships and make predictions about diabetes probabilities in the future. The three models will be a logistic regression model, classification tree, and a random forest.</p>
 <p>#Data: Use a relative path to import data</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Read in data and create a tibble </span></span>
@@ -178,7 +178,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(diabetes_data)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(diabetes_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Above, we can see the frequency of our variables and the variable type for each variable. This will be important later as we create the models.</p>
+<p>Above, we can see the frequency of our variables and the variable type for each variable. This will be important later as we create the models. We will get more into the summary of each variable below.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Graph for BMI</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>diabetes_data, <span class="fu">aes</span>(<span class="at">x=</span>BMI))<span class="sc">+</span></span>
@@ -226,7 +226,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>From looking at this chart, we can determine that only around 14% of our sample has diabetes. The amount of the sample with high blood pressure is almost 43% and those who excercise is around 76%</p>
+<p>From looking at this chart, we can determine that only around 14% of our sample has diabetes.</p>
+<p>The amount of the sample with high blood pressure is almost 43% and those who excercise is around 76%.</p>
 <p>#Look at relationship between diabetes and each of the #indepedent variables</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Diabetes + BMI</span></span>
@@ -298,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percentage"</span>,</span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"High Blood Pressure"</span></span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -341,7 +342,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percentage"</span>,</span>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Physical Activity"</span></span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
 <span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -351,7 +352,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>When looking at the chart of diabetes status by physical activity, we can see that over 50% of those with diabetes do physical activity, but those who do not have diabetes are more likely to do physical activity.</p>
+<p>When looking at the chart of diabetes status by physical activity, we can see that while over 50% of those with diabetes do physical activity, those who do not have diabetes do more physical activity.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Looking interactions between the BMI and High blood pressure</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>BMIMeans <span class="ot">&lt;-</span> diabetes_data <span class="sc">|&gt;</span></span>
@@ -393,7 +394,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>From the table of means and the boxplot we can determine that those with diabetes have a slightly greater BMI despite there blood pressure status. Those who have high BP typically have a higher BMI despite diabetes status.</p>
+<p>From the table of means and the boxplot we can determine that those with diabetes have a slightly greater BMI despite there blood pressure status.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Looking interactions between the BMI and Physical Activity</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>PhysicalAct_Means <span class="ot">&lt;-</span> diabetes_data <span class="sc">|&gt;</span></span>
@@ -436,7 +437,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>#Takeaways from EDA</p>
-<p>From our explorationtory data analysis, we can determine that all three variables has some effect on diabetes, althought it does not seem that all are created equal, as high blood seems to have the strongest relationship with diabetes.</p>
+<p>From our EDA, we can determine that all three variables have at least some effect on diabetes, although it does not seem that all variables were created equal, as high blood seems to have the strongest relationship with diabetes.</p>
 <p><a href="Modeling.html">Click here for the Modeling Page</a></p>
 
 
