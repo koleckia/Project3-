@@ -19,7 +19,7 @@ For the next section of the project, I will do exploratory data analysis to anal
 
 In the second part of this project, I will use three different models to help understand the relationships and make predictions about diabetes probabilities in the future. The three models will be a logistic regression model, classification tree, and a random forest. 
 
-#Data: Use a relative path to import data 
+Data: Use a relative path to import data 
 
 ```{r,results="hide"}
 #Read in data and create a tibble 
@@ -56,7 +56,7 @@ diabetes_data <- diabetes_data |>
   select(Diabetes_binary,HighBP,PhysActivity,BMI)
 ```
 
-#Summarizations: Univariate 
+Summarizations: Univariate 
 
 ```{r,results="hide"}
 #Look at summary of the data and the structure of the variables 
