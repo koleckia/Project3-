@@ -100,6 +100,15 @@ final_model <- rf_final_fit$.workflow[[1]]
 #* @param BMI BMI
 #* @param HighBP High BP (1 for Yes, 0 for No)
 #* @param PhysActivity Physical Activity (1 for Yes, 0 for No)
+#* @apiExample {curl} Example 1:
+#*      "http://localhost:8000/prediction?BMI=35&HighBP=1&PhysActivity=0"
+#*
+#* @apiExample {curl} Example 2:
+#*      "http://localhost:8000/prediction?BMI=27&HighBP=1&PhysActivity=1"
+#*
+#* @apiExample {curl} Example 3:
+#*      "http://localhost:8000/prediction?BMI=38&HighBP=0&PhysActivity=0"
+#*
 #* @get /prediction
 function(BMI = 28, HighBP = 0, PhysActivity = 1) {
   pred_data <- data.frame(BMI = as.numeric(BMI), 
@@ -109,18 +118,15 @@ function(BMI = 28, HighBP = 0, PhysActivity = 1) {
   prediction <- predict(final_model , pred_data, type = "prob")
   return(prediction)
 }
-#http://localhost:PORT/prediction?BMI=28HighBP=0&PhysActivity=1
+# http://localhost:PORT/prediction?BMI=28HighBP=0&PhysActivity=1
 
-#* @apiExample {curl} Example usage:
-#* @curl "http://localhost:8000/prediction?BMI=35&HighBP=1&PhysActivity=0"
-#* @curl "http://localhost:8000/prediction?BMI=27&HighBP=1&PhysActivity=1"
-#* @curl "http://localhost:8000/prediction?BMI=38&HighBP=0&PhysActivity=0"
+
 
 #Create info end point 
 #* @get /info
 function(){
   list(name= "Alexis Kolecki",
-  url="Insert URL here")
+  url="https://koleckia.github.io/Project3-/")
 }
 
 #http://localhost:PORT/info
