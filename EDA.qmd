@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-```{r}
+```{r,include = FALSE}
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
@@ -15,9 +15,9 @@ library(ggplot2)
 
 For this project, I will be analyzing the impact of specific health indicators on the likelhood of getting diabetes. While there are many indicators in the data set, I have decided to only look into three specific variables: Physical activity, BMI and Blood Pressure. I picked these three variables to specifically narrow down the impacts of cardiometabolic factors on diabetes. 
 
-For the next section of the project, I will do exploratory data analysis to analyze the relationships each of the three variables have on the independent variable, diabetes. This will also help identify any data quality issues and help understand the different data types and distributions. 
+For the next section of the project, I will do exploratory data analysis to analyze the relationships each of the three variables have on the independent variable of having diabetes. This EDA will also help identify any data quality issues and help understand the different data types and distributions. 
 
-Lastly, I will use three models on the different variables to help understand the relationships and make predictions about diabetes probabilities in the future. The three models will be a logistic regression model, classification tree, and a random forest. 
+In the second part of this project, I will use three different models to help understand the relationships and make predictions about diabetes probabilities in the future. The three models will be a logistic regression model, classification tree, and a random forest. 
 
 #Data: Use a relative path to import data 
 
@@ -64,7 +64,7 @@ summary(diabetes_data)
 str(diabetes_data)
 ```
 
-Above, we can see the frequency of our variables and the variable type for each variable. This will be important later as we create the models.
+Above, we can see the frequency of our variables and the variable type for each variable. This will be important later as we create the models. We will get more into the summary of each variable below.
 
 ```{r}
 #Graph for BMI
@@ -105,7 +105,8 @@ ggplot(Frequencies, aes(x = factor(Categories), y = Percentage, fill = factor(Ca
 ```
 
 From looking at this chart, we can determine that only around 14% of our sample has diabetes. 
-The amount of the sample with high blood pressure is almost 43% and those who excercise is around 76% 
+
+The amount of the sample with high blood pressure is almost 43% and those who excercise is around 76%. 
 
 #Look at relationship between diabetes and each of the 
 #indepedent variables
@@ -159,7 +160,7 @@ ggplot(High_BP_Percentages, aes(x = factor(Diabetes_binary), y = percent, fill =
     y = "Percentage",
     fill = "High Blood Pressure"
   ) +
-  theme_minimal(base_size = 14) +
+  theme_minimal(base_size = 12) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 From this graph, we can clearly see that those who have diabetes are much more likely to have high blood pressure as 75% have high blood pressure compared to only 38% of those who do not have diabetes. 
@@ -187,11 +188,11 @@ ggplot(Phys_Activity_Percentages, aes(x = factor(Diabetes_binary), y = percent, 
     y = "Percentage",
     fill = "Physical Activity"
   ) +
-  theme_minimal(base_size = 14) +
+  theme_minimal(base_size = 10) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-When looking at the chart of diabetes status by physical activity, we can see that over 50% of those with diabetes do physical activity, but those who do not have diabetes are more likely to do physical activity.
+When looking at the chart of diabetes status by physical activity, we can see that while over 50% of those with diabetes do physical activity, those who do not have diabetes do more physical activity.
 
 ```{r}
 #Looking interactions between the BMI and High blood pressure
@@ -220,7 +221,7 @@ ggplot(data = diabetes_data, aes(x = HighBP, y = BMI, fill = factor(Diabetes_bin
   )
 ```
 
-From the table of means and the boxplot we can determine that those with diabetes have a slightly greater BMI despite there blood pressure status. Those who have high BP typically have a higher BMI despite diabetes status. 
+From the table of means and the boxplot we can determine that those with diabetes have a slightly greater BMI despite there blood pressure status. 
 
 ```{r}
 #Looking interactions between the BMI and Physical Activity
@@ -250,6 +251,8 @@ ggplot(data = diabetes_data, aes(x = PhysActivity, y = BMI, fill = factor(Diabet
 
 ```
 
+#Takeaways from EDA 
 
+From our EDA, we can determine that all three variables have at least some effect on diabetes, although it does not seem that all variables were created equal, as high blood seems to have the strongest relationship with diabetes. 
 
 [Click here for the Modeling Page](Modeling.html)
